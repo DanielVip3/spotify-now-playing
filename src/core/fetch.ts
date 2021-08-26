@@ -3,17 +3,32 @@ import { Utils } from "./utils";
 import { env, auth } from "../constants";
 
 export namespace Fetch {
+    /**
+     * Describes an access token, used in this namespace.
+     */
     export class AccessToken {
+        /**
+         * @param token - The actual token, provided by Spotify's API.
+         * @param type - How the access token may be used. It will always be "Bearer".
+         */
         constructor(
             public readonly token: string,
             public readonly type: string = "Bearer"
         ) {}
     
+        /**
+         * The access token but pre-formatted to be used in the "Authorization" HTTP header.
+         */
         get authorizationHeader(): string {
             return `${this.type} ${this.token}`;
         }
     }
-    
+
+    /**
+     * Gets an access token from Spotify's API, using the constant refresh token.
+     * @returns an {@link AccessToken} instance.
+     * @throws an error, if refresh token is incorrect or something went wrong.
+     */
     export async function getAccessToken(): Promise<AccessToken> {
         const tokenRes: AxiosResponse<SpotifyApi.AccessTokenResponse> = await axios.post(
             `${env.SPOTIFY_ACCOUNTS_ENDPOINT}/api/token`,
@@ -37,6 +52,13 @@ export namespace Fetch {
         }
     }
     
+    /**
+     * Gets the recently played tracks from Spotify's API, on behalf of the user account owner of the access token.
+     * @param accessToken - an {@link AccessToken} instance.
+     * @param refreshAccessToken - a method that will be called (a single time) when the access token results expired, to refresh it. Must return an {@link AccessToken}.
+     * @returns a {@link SpotifyApi.RecentlyPlayedObject}, or undefined if nothing is found or the access token results expired and can't be refreshed.
+     * @throws an error, if something goes wrong, but NOT if the access token is expired and can't be refreshed. No error will be thrown in that case, and undefined will be returned.
+     */
     export async function getRecentlyPlayed(
             accessToken?: AccessToken, refreshAccessToken?: () => Promise<AccessToken|undefined>
         ): Promise<SpotifyApi.RecentlyPlayedObject|undefined> {
@@ -64,6 +86,13 @@ export namespace Fetch {
         }
     }
     
+    /**
+     * Gets the currently playing track from Spotify's API, on behalf of the user account owner of the access token.
+     * @param accessToken - an {@link AccessToken} instance.
+     * @param refreshAccessToken - a method that will be called (a single time) when the access token results expired, to refresh it. Must return an {@link AccessToken}.
+     * @returns a {@link SpotifyApi.CurrentlyPlayingObject}, or undefined if no track is playing currently, nothing is found or the access token results expired and can't be refreshed.
+     * @throws an error, if something goes wrong, but NOT if the access token is expired and can't be refreshed. No error will be thrown in that case, and undefined will be returned.
+     */
     export async function getCurrentlyPlaying(
             accessToken?: AccessToken, refreshAccessToken?: () => Promise<AccessToken|undefined>
         ): Promise<SpotifyApi.CurrentlyPlayingObject|undefined> {

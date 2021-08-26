@@ -1,4 +1,10 @@
 {
+  "name": "spotify-now-playing",
+  "description": "A simple 'Now playing' Spotify HTML widget to show up what I'm listening to almost everywhere.",
+  "author": "DanielVip3",
+  "version": "0.0.1",
+  "homepage": "https://github.com/DanielVip3/spotify-now-playing",
+  "license": "MIT",
   "scripts": {
     "dev": "ts-node --files ./src/index.ts"
   },

@@ -108,7 +108,8 @@ export namespace Fetch {
             });
         
             if (Utils.isDataAvailable(playingRes.status, playingRes.data)) {
-                return playingRes.data;
+                if (playingRes.data.currently_playing_type === "track") return playingRes.data;
+                else return undefined;
             } else {
                 if (playingRes.status !== 200) return undefined;
                 else throw new Error("Currently playing request error: unknown error, data unavailable");

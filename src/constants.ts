@@ -9,6 +9,7 @@ const env = load({
     SPOTIFY_ACCOUNTS_ENDPOINT: String,
     SPOTIFY_API_ENDPOINT: String,
     SPOTIFY_REFRESH_TOKEN: String,
+    SPOTIFY_USER_URL: String,
 });
 
 /**

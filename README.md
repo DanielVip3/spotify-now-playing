@@ -2,6 +2,7 @@
 A simple "Now playing" Spotify HTML widget to show up what I'm listening to almost everywhere.
 
 # TO-DO:
+- Better logging.
 - Add ESLint and prettier.
 - Finish up TS configuration.
 - Write automatic test suites.

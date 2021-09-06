@@ -119,4 +119,40 @@ export namespace Fetch {
             } else throw err;
         }
     }
+
+    /**
+     * Gets a single full track from Spotify's API, only from its id. Useful to get {@link SpotifyApi.TrackObjectFull} from {@link SpotifyApi.TrackObjectSimplified}.
+     * @param id - the Spotify ID for the track (base-62 identifier that you can find at the end of the Spotify URI for the track).
+     * @param accessToken - an {@link AccessToken} instance.
+     * @param refreshAccessToken - a method that will be called (a single time) when the access token results expired, to refresh it. Must return an {@link AccessToken}.
+     * @returns a {@link SpotifyApi.TrackObjectFull}, or undefined if no trac kis found or the access token results expired and can't be refreshed.
+     * @throws an error, if something goes wrong, but NOT if the access token is expired and can't be refreshed. No error will be thrown in that case, and undefined will be returned.
+     */
+    export async function getFullTrack(
+        id: String, accessToken?: AccessToken, refreshAccessToken?: () => Promise<AccessToken|undefined>
+    ): Promise<SpotifyApi.TrackObjectFull|undefined> {
+
+        if (!accessToken) return undefined;
+        if (!id) return undefined;
+
+        try {
+            const trackRes: AxiosResponse<SpotifyApi.TrackObjectFull> = await axios.get(`${env.SPOTIFY_API_ENDPOINT}/v1/me/player/tracks/${id}`, {
+                headers: {
+                    Authorization: accessToken.authorizationHeader
+                },
+                responseType: 'json',
+            });
+
+            if (Utils.isDataAvailable(trackRes.status, trackRes.data)) {
+                return trackRes.data;
+            } else {
+                if (trackRes.status !== 200) return undefined;
+                else throw new Error("Track request error: unknown error, data unavailable");
+            }
+        } catch (err) {
+            if (err?.response?.data?.error && err.response.data.error.status >= 300) {
+                return refreshAccessToken ? await getFullTrack(id, await refreshAccessToken(), async() => undefined) : undefined;
+            } else throw err;
+        }
+    }
 }
